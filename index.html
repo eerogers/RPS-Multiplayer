@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Rock-Paper-Scissors</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class=jumbotron>Rock-Paper-Scissors</div>
+        <div class="row">
+            <div class="col-md-4">
+                <div id="player1Prompt">Player 1, Choose Your Weapon:</div>
+                <div id="choice1">Rock</div>
+                <div id="choice2">Paper</div>
+                <div id="choice3">Scissors</div>
+            </div>
+            <div class="col-md-4">
+                <div id="results"></div>
+            </div>
+            <div class="col-md-4">
+                <div id="player2Prompt">Player 2, Choose Your Weapon:</div>
+                <div id="twochoice1">Rock</div>
+                <div id="twochoice2">Paper</div>
+                <div id="twochoice3">Scissors</div>
+            </div>
+        </div>
+        <div class="row results-row">
+            <div class="col-md-5">
+                <div>Player 1 Wins = <span id="onespan">0</span></div>
+                <div>Player 2 Wins = <span id="twospan">0</span></div>
+                <div>Draws = <span id="dspan">0</span></div>
+            </div>
+            <div class="col-md-3"></div>
+            <div class="col-md-4">
+                <button id="reset">Reset Game</button>
+            </div>
+        </div>
+    </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js" 
+integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" 
+crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/live/3.0/firebase.js"></script>
+<script>
+$(document).ready(function() {
+    var config = {
+    apiKey: "AIzaSyBYAfruQX2uZ-DPIg0y9hvT7eFTxwZGXug",
+    authDomain: "initial-project-50855.firebaseapp.com",
+    databaseURL: "https://initial-project-50855.firebaseio.com",
+    projectId: "initial-project-50855",
+    storageBucket: "initial-project-50855.appspot.com",
+    messagingSenderId: "504287985702"
+    }
+    firebase.initializeApp(config);
+    
+    var player1Choice = ""
+    var player2Choice = ""
+    var isOneChoice = false
+    var isTwoChoice = false
+    var oneWins = 0
+    var twoWins = 0
+    var draws = 0
+
+    $("#choice1").click(function() {
+        if (isOneChoice == false){
+            player1Choice = "Rock"
+            console.log(player1Choice)
+            $("#player1Prompt").text("Player 1 Has Chosen")
+            isOneChoice = true
+            choicesMade()
+        }
+        else {
+            console.log("You already chose.")
+        }
+    })
+
+    $("#choice2").click(function(){
+        if (isOneChoice == false){    
+            player1Choice= "Paper"
+            console.log(player1Choice)
+            $("#player1Prompt").text("Player 1 Has Chosen")
+            isOneChoice = true
+            choicesMade()
+        }
+        else {
+            console.log("You already chose.")
+        }
+    })
+    $("#choice3").click(function (){
+        if (isOneChoice == false){
+            player1Choice= "Scissors"
+            console.log(player1Choice)
+            $("#player1Prompt").text("Player 1 Has Chosen")
+            isOneChoice = true
+            choicesMade()
+        }
+        else {
+            console.log("You already chose.")
+        }
+    })
+
+    $("#twochoice1").click(function() {
+        if (isTwoChoice == false){   
+            player2Choice = "Rock"
+            console.log(player2Choice)
+            $("#player2Prompt").text("Player 2 Has Chosen")
+            isTwoChoice = true
+            choicesMade()
+        }
+        else {
+            console.log("You already chose.")
+        }
+    })
+    $("#twochoice2").click(function(){
+        if (isTwoChoice == false){
+            player2Choice= "Paper"
+            console.log(player2Choice)
+            $("#player2Prompt").text("Player 2 Has Chosen")
+            isTwoChoice = true
+            choicesMade()
+        }
+        else {
+            console.log("You already chose.")
+        }
+    })
+    $("#twochoice3").click(function (){
+        if (isTwoChoice == false){
+            player2Choice= "Scissors"
+            console.log(player2Choice)
+            $("#player2Prompt").text("Player 2 Has Chosen")
+            isTwoChoice = true
+            choicesMade()
+        }
+        else {
+            console.log("You already chose.")
+        }
+    })
+
+    $("#reset").click(function(){
+        isOneChoice = false
+        isTwoChoice = false
+        $("#player1Prompt").text("Player 1, Choose Your Weapon:")
+        $("#player2Prompt").text("Player 2, Choose Your Weapon:")
+        oneWins=0
+        twoWins=0
+        draws=0
+        $("#dspan").text(draws)
+        $("#onespan").text(oneWins)
+        $("#twospan").text(twoWins)
+
+    })
+    function choicesMade() {
+        if (isOneChoice && isTwoChoice) {
+            gamePlay()
+        }
+    }
+    
+
+    function gamePlay() {
+        console.log("game starts now")
+        if (player1Choice == player2Choice) {
+            $("#results").html(player1Choice+" VS "+player2Choice+"<div>It's a Draw!</div>")
+            isOneChoice = false
+            isTwoChoice = false
+            draws++
+            $("#player1Prompt").text("Player 1, Choose Your Weapon:")
+            $("#player2Prompt").text("Player 2, Choose Your Weapon:")
+            $("#dspan").text(draws)
+        }
+
+        if ((player1Choice == "Rock" && player2Choice == "Scissors") 
+            || (player1Choice == "Paper" && player2Choice == "Rock") 
+            || (player1Choice == "Scissors" && player2Choice == "Paper")) {
+            $("#results").html(player1Choice+" VS "+player2Choice+"<div>Player One Wins!</div>")
+            isOneChoice = false
+            isTwoChoice = false
+            oneWins++
+            $("#player1Prompt").text("Player 1, Choose Your Weapon:")
+            $("#player2Prompt").text("Player 2, Choose Your Weapon:")
+            $("#onespan").text(oneWins)
+
+        }
+        if ((player2Choice == "Rock" && player1Choice == "Scissors") 
+            || (player2Choice == "Paper" && player1Choice == "Rock") 
+            || (player2Choice == "Scissors" && player1Choice == "Paper"))  {
+            $("#results").html(player1Choice+" VS "+player2Choice+"<div>Player Two Wins!</div>")
+            isOneChoice = false
+            isTwoChoice = false
+            twoWins++
+            $("#player1Prompt").text("Player 1, Choose Your Weapon:")
+            $("#player2Prompt").text("Player 2, Choose Your Weapon:")
+            $("#twospan").text(twoWins)
+        }
+    }
+
+    var database = firebase.database(); 
+
+})
+</script>
+</body>
+</html>

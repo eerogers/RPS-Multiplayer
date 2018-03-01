@@ -1,0 +1,67 @@
+.jumbotron {
+    text-align: center;
+    font-size: 45px;
+    background-color: black;
+    color: lightseagreen;
+}
+
+body {
+    background-color: lightseagreen;
+}
+
+.col-md-5, .col-md-4 {
+    text-align: center;
+    margin: 0px;
+    padding: 0px;
+    font-size: 26px;
+}
+#choice1, #choice2, #choice3 {
+    color: black;
+    padding: 3px;
+}
+
+#choice1:hover, #choice2:hover, #choice3:hover {
+    color: white;
+    background-color: black;
+}
+
+#twochoice1, #twochoice2, #twochoice3 {
+    color: black;
+    padding: 3px;
+}
+
+#twochoice1:hover, #twochoice2:hover, #twochoice3:hover {
+    color: white;
+    background-color: black;
+}
+
+#results {
+    border-style: solid;
+    border-width: 5px;
+    border-color: lightgreen;
+    height: 150px;
+    padding: 30px 0px 0px 0px;
+}
+.results-row {
+    text-align: center;
+    margin: 20px 0px 0px 0px;
+    font-size: 16px;
+    border-style: solid;
+    border-width: 5px;
+    border-color: lightgreen;
+    height: 150px;
+    padding: 15px 0px 0px 0px;
+    font-size: 26px;
+}
+
+#player1Prompt, #player2Prompt {
+    font-size: 16px;
+}
+
+#reset {
+    margin: 5px 0px 0px 0px;
+    background-color: black;
+    color: lightseagreen;
+    width: 100%;
+    padding: 30px 0px 30px 0px;
+}
