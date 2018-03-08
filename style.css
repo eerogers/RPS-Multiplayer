@@ -3,6 +3,7 @@
     font-size: 45px;
     background-color: black;
     color: lightseagreen;
+    margin: 0px;
 }
 
 body {
@@ -54,14 +55,66 @@ body {
     font-size: 26px;
 }
 
+@media screen and (max-width: 992px){
+    .results-row {
+        height: 250px;
+    }
+}
+
 #player1Prompt, #player2Prompt {
     font-size: 16px;
 }
 
 #reset {
     margin: 5px 0px 0px 0px;
-    background-color: black;
-    color: lightseagreen;
+    color: black;
+    background-color: lightgreen;
     width: 100%;
     padding: 30px 0px 30px 0px;
+}
+
+#hello-area-one, #hello-area-two {
+    text-align: center;
+    padding: 10px 0px 10px 0px;
+    font-size: 20px;
+}
+
+#input-area-one, #input-area-two {
+    text-align: center;
+    padding: 10px 0px 10px 0px;
+    font-size: 20px;
+}
+
+#submit-name-one, #submit-name-two {
+    margin: 10px;
+    padding: 10px;
+    font-size: 16px;
+    background-color: lightgreen;
+}
+
+.chat-box {
+    height: 200px;
+    width: 100%;
+    border: 1px solid #ccc;
+    overflow: auto;
+    padding: 10px; 
+    background-color: white;
+}
+
+#entry-chat {
+    width: 90%;
+}
+
+#enter {
+    float: right;
+    background-color: lightgreen;
+    width: 10%;
+}
+
+.chat-row {
+    margin: 20px 0px 0px 0px
+}
+
+.extra-row {
+    height: 30px;
 }

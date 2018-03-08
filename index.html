@@ -14,11 +14,21 @@
     <div class="container">
         <div class=jumbotron>Rock-Paper-Scissors</div>
         <div class="row">
+            <div class="col-md-6">
+            <div id="input-area-one"><span id="to-submit-name-one">Name: <input id="user-name-one" type="text"><button id="submit-name-one" type="submit">Join As Player 1</button></span></div>
+            <div id="hello-area-one"><span id="hello-user-one"></span></div>
+            </div>
+            <div class="col-md-6">
+            <div id="input-area-two"><span id="to-submit-name-two">Name: <input id="user-name-two" type="text"><button id="submit-name-two" type="submit">Join As Player 2</button></span></div>
+            <div id="hello-area-two"><span id="hello-user-two"></span></div>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-md-4">
                 <div id="player1Prompt">Player 1, Choose Your Weapon:</div>
-                <div id="choice1">Rock</div>
-                <div id="choice2">Paper</div>
-                <div id="choice3">Scissors</div>
+                <div class="one" id="choice1">Rock</div>
+                <div class="one" id="choice2">Paper</div>
+                <div class="one" id="choice3">Scissors</div>
             </div>
             <div class="col-md-4">
                 <div id="results"></div>
@@ -41,6 +51,11 @@
                 <button id="reset">Reset Game</button>
             </div>
         </div>
+        <div class="row chat-row">
+            <div class="chat-box"></div>
+            <input id="entry-chat" type="text"><button id="enter" type="submit">Enter</button>
+        </div>
+        <div class="row extra-row"></div>
     </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js" 
 integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" 
@@ -57,7 +72,9 @@ $(document).ready(function() {
     messagingSenderId: "504287985702"
     }
     firebase.initializeApp(config);
-    
+    var database = firebase.database(); 
+    var isUserOne = false
+    var isUserTwo = false
     var player1Choice = ""
     var player2Choice = ""
     var isOneChoice = false
@@ -65,140 +82,307 @@ $(document).ready(function() {
     var oneWins = 0
     var twoWins = 0
     var draws = 0
+    var user = ""
+    var amUserOne = false
+    var amUserTwo = false
+    var isResult = false
 
-    $("#choice1").click(function() {
-        if (isOneChoice == false){
-            player1Choice = "Rock"
-            console.log(player1Choice)
-            $("#player1Prompt").text("Player 1 Has Chosen")
-            isOneChoice = true
-            choicesMade()
+    //so any change in value to the database syncs with the local variables
+    database.ref().on("value", function(snap){
+        player1Choice = snap.val().player1.Choice
+        player2Choice = snap.val().player2.Choice
+        isOneChoice = snap.val().player1.isOneChoice
+        isTwoChoice = snap.val().player2.isTwoChoice
+        isUserOne = snap.val().user1.Exists
+        isUserTwo = snap.val().user2.Exists
+        userOne = snap.val().user1.Name
+        userTwo = snap.val().user2.Name
+        oneWins = snap.val().game.oneWins
+        twoWins = snap.val().game.twoWins
+        draws = snap.val().game.draws
+        isResult = snap.val().game.isResult
+        $("#dspan").text(draws)
+        $("#onespan").text(oneWins)
+        $("#twospan").text(twoWins)
+    }, function (errorObject){
+        console.log("The read failed:" +errorObject)
+    })
+//unsure about the following code's functionality as it is still buggy and doesn't always work
+//'pointlessBox' and 'pointlessBox2' are used entirely as triggers for events, probably a better way to do this
+    database.ref('/pointlessBox').on('child_added', function(snap){
+        if(!amUserOne && isUserOne) {
+        $("#to-submit-name-one").empty()
+        $("#hello-area-one").html("<span id='hello-user-one'>Player One ("+ userOne+") Is Ready.</span>")
         }
-        else {
-            console.log("You already chose.")
+        if(!amUserTwo && isUserTwo) {
+        $("#to-submit-name-two").empty()
+        $("#hello-area-two").html("<span id='hello-user-two'>Player Two ("+ userTwo+") Is Ready.</span>")
+        }
+    }, function (errorObject){
+        console.log("The read failed:" +errorObject)
+    })
+
+    database.ref('/pointlessBox2').on('child_added', function(){
+        $("#player1Prompt").text("Player 1, Choose Your Weapon:")
+        $("#player2Prompt").text("Player 2, Choose Your Weapon:")
+        $("#input-area-one").html("<span id='to-submit-name-one'>Name: <input id='user-name-one' type='text'><button id='submit-name-one' type='submit'>Join As Player 1</button></span>")
+        $("#input-area-two").html("<span id='to-submit-name-two'>Name: <input id='user-name-two' type='text'><button id='submit-name-two' type='submit'>Join As Player 2</button></span>")
+        $("#hello-user-one").empty()
+        $("#hello-user-two").empty()
+        $("#results").empty()
+    }, function (errorObject){
+        console.log("The read failed:" +errorObject)
+    })
+
+    database.ref('/resultsBox').on('child_added', function(snap){
+        if (isResult){
+            $("#results").html(snap.val().player1Choice + " VS " + snap.val().player2Choice + "<br>" + snap.val().Line)
+        }
+    }, function (errorObject){
+        console.log("The read failed:" +errorObject)
+    })
+
+    database.ref('game').on("value", function(snap){
+        $("#player1Prompt").text("Player 1, Choose Your Weapon:")
+        $("#player2Prompt").text("Player 2, Choose Your Weapon:")
+
+    }, function (errorObject){
+        console.log("The read failed:" +errorObject)
+    })
+        
+    var game = database.ref('/game')
+    var pointlessBox = database.ref('/pointlessBox')
+    var pointlessBox2 = database.ref('/pointlessBox2')
+    var resultsBox = database.ref('/resultsBox')
+    var chat = database.ref('/chat')
+
+    $(document).on("click", "#enter", function(){
+      chat.push({
+          user: user,
+          message: $("#entry-chat").val()
+      })
+    })
+
+    database.ref('/chat').on('child_added', function(snap){
+        $(".chat-box").append("<br>" + snap.val().user + ": " + snap.val().message)
+    }, function (errorObject){
+        console.log("The read failed:" +errorObject)
+    })
+
+    function load(){
+        database.ref('user1').set({
+            Name: "",
+            Exists: false,
+        })
+        database.ref('user2').set({
+            Name: "",
+            Exists: false,
+        })
+        database.ref('player1').set({
+            Choice: "",
+            isOneChoice: false
+        })
+        database.ref('player2').set({
+            Choice: "",
+            isTwoChoice: false
+        })
+        database.ref('game').set({
+            oneWins: 0,
+            twoWins: 0,
+            draws: 0,
+            isResult: false
+        })
+        pointlessBox2.push({
+            force: "reload"
+        })
+    }
+   
+    $(document).on("click", "#submit-name-one", function(event) {
+        event.preventDefault();
+        user = $("#user-name-one").val()
+        $("#to-submit-name-one").empty()
+        $("#to-submit-name-two").empty()
+        amUserOne = true
+        database.ref('user1').set({
+            Exists: true,
+            Name: user,
+        })
+        pointlessBox.push({
+            change: "change"
+        })
+        $("#hello-area-one").html("<span id='hello-user-one'>Hello, "+ userOne+"! You are Player One.</span>")
+    })
+    $(document).on("click", "#submit-name-two", function(event) {
+        event.preventDefault();
+        user = $("#user-name-two").val()
+        $("#to-submit-name-one").empty()
+        $("#to-submit-name-two").empty()
+        amUserTwo = true
+        database.ref('user2').set({
+            Exists: true,
+            Name: user,
+        })
+        pointlessBox.push({
+            change: "change"
+        })
+        $("#hello-area-two").html("<span id='hello-user-two'>Hello, "+ userTwo+"! You are Player Two.</span>")
+    })
+    
+    $("#choice1").click(function() {
+        if ((amUserOne == true) && (isOneChoice == false)){
+            $("#player1Prompt").text("Player 1 Has Chosen")
+            database.ref('player1').set({
+                Choice: "Rock",
+                isOneChoice: true
+            })
+            choicesMade()
         }
     })
 
     $("#choice2").click(function(){
-        if (isOneChoice == false){    
-            player1Choice= "Paper"
-            console.log(player1Choice)
+        if ((amUserOne == true) && (isOneChoice == false)){    
             $("#player1Prompt").text("Player 1 Has Chosen")
-            isOneChoice = true
+            database.ref('player1').set({
+                Choice: "Paper",
+                isOneChoice: true,
+            })
             choicesMade()
-        }
-        else {
-            console.log("You already chose.")
         }
     })
+
     $("#choice3").click(function (){
-        if (isOneChoice == false){
-            player1Choice= "Scissors"
-            console.log(player1Choice)
+        if ((amUserOne == true) && (isOneChoice == false)){
             $("#player1Prompt").text("Player 1 Has Chosen")
-            isOneChoice = true
+            database.ref('player1').set({
+                Choice: "Scissors",
+                isOneChoice: true,
+            })
             choicesMade()
-        }
-        else {
-            console.log("You already chose.")
         }
     })
 
     $("#twochoice1").click(function() {
-        if (isTwoChoice == false){   
-            player2Choice = "Rock"
-            console.log(player2Choice)
+        if (amUserTwo == true && isTwoChoice == false){   
             $("#player2Prompt").text("Player 2 Has Chosen")
             isTwoChoice = true
+            database.ref('player2').set({
+                Choice: "Rock",
+                isTwoChoice: true
+            })
             choicesMade()
         }
-        else {
-            console.log("You already chose.")
-        }
     })
+
     $("#twochoice2").click(function(){
-        if (isTwoChoice == false){
-            player2Choice= "Paper"
-            console.log(player2Choice)
+        if (amUserTwo == true && isTwoChoice == false){
             $("#player2Prompt").text("Player 2 Has Chosen")
-            isTwoChoice = true
+            database.ref('player2').set({
+                Choice: "Paper",
+                isTwoChoice: true
+            }) 
             choicesMade()
-        }
-        else {
-            console.log("You already chose.")
         }
     })
+
     $("#twochoice3").click(function (){
-        if (isTwoChoice == false){
-            player2Choice= "Scissors"
-            console.log(player2Choice)
+        if (amUserTwo == true && isTwoChoice == false){
             $("#player2Prompt").text("Player 2 Has Chosen")
-            isTwoChoice = true
+            database.ref('player2').set({
+                Choice: "Scissors",
+                isTwoChoice: true
+            })
             choicesMade()
-        }
-        else {
-            console.log("You already chose.")
         }
     })
 
     $("#reset").click(function(){
-        isOneChoice = false
-        isTwoChoice = false
-        $("#player1Prompt").text("Player 1, Choose Your Weapon:")
-        $("#player2Prompt").text("Player 2, Choose Your Weapon:")
-        oneWins=0
-        twoWins=0
-        draws=0
-        $("#dspan").text(draws)
-        $("#onespan").text(oneWins)
-        $("#twospan").text(twoWins)
-
+       load()
     })
+
     function choicesMade() {
         if (isOneChoice && isTwoChoice) {
             gamePlay()
         }
     }
-    
 
     function gamePlay() {
         console.log("game starts now")
         if (player1Choice == player2Choice) {
-            $("#results").html(player1Choice+" VS "+player2Choice+"<div>It's a Draw!</div>")
-            isOneChoice = false
-            isTwoChoice = false
-            draws++
-            $("#player1Prompt").text("Player 1, Choose Your Weapon:")
-            $("#player2Prompt").text("Player 2, Choose Your Weapon:")
-            $("#dspan").text(draws)
+            draws++ 
+            database.ref('game').set({
+                oneWins: oneWins,
+                twoWins: twoWins,
+                draws: draws,
+                isResult: true
+            })
+            resultsBox.push({
+                player1Choice: player1Choice,
+                player2Choice: player2Choice,
+                Line: "It's A Draw!",
+            })
+            database.ref('player1').set({
+                Choice: "",
+                isOneChoice: false
+            })
+            database.ref('player2').set({
+                Choice: "",
+                isTwoChoice: false
+            })
+            
+           
         }
 
-        if ((player1Choice == "Rock" && player2Choice == "Scissors") 
+        if ((player1Choice == "Rock") && (player2Choice == "Scissors") 
             || (player1Choice == "Paper" && player2Choice == "Rock") 
             || (player1Choice == "Scissors" && player2Choice == "Paper")) {
-            $("#results").html(player1Choice+" VS "+player2Choice+"<div>Player One Wins!</div>")
-            isOneChoice = false
-            isTwoChoice = false
             oneWins++
-            $("#player1Prompt").text("Player 1, Choose Your Weapon:")
-            $("#player2Prompt").text("Player 2, Choose Your Weapon:")
-            $("#onespan").text(oneWins)
-
+            database.ref('game').set({
+                oneWins: oneWins,
+                twoWins: twoWins,
+                draws: draws,
+                isResult: true,
+            })
+            resultsBox.push({
+                player1Choice: player1Choice,
+                player2Choice: player2Choice,
+                Line: "Player 1 Wins!",
+            })
+            database.ref('player1').set({
+                Choice: "",
+                isOneChoice: false
+            })
+            database.ref('player2').set({
+                Choice: "",
+                isTwoChoice: false
+            })
+            
+           
         }
-        if ((player2Choice == "Rock" && player1Choice == "Scissors") 
+        if ((player2Choice == "Rock" && player1Choice == "Scissors")
             || (player2Choice == "Paper" && player1Choice == "Rock") 
             || (player2Choice == "Scissors" && player1Choice == "Paper"))  {
-            $("#results").html(player1Choice+" VS "+player2Choice+"<div>Player Two Wins!</div>")
-            isOneChoice = false
-            isTwoChoice = false
             twoWins++
-            $("#player1Prompt").text("Player 1, Choose Your Weapon:")
-            $("#player2Prompt").text("Player 2, Choose Your Weapon:")
-            $("#twospan").text(twoWins)
+            database.ref('game').set({
+                oneWins: oneWins,
+                twoWins: twoWins,
+                draws: draws,
+                isResult: true
+            })
+            resultsBox.push({
+                player1Choice: player1Choice,
+                player2Choice: player2Choice,
+                Line: "Player 2 Wins!",
+            })
+            database.ref('player1').set({
+                Choice: "",
+                isOneChoice: false
+            })
+            database.ref('player2').set({
+                Choice: "",
+                isTwoChoice: false
+            })
         }
     }
-
-    var database = firebase.database(); 
 
 })
 </script>
