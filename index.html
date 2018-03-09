@@ -12,7 +12,9 @@
 </head>
 <body>
     <div class="container">
-        <div class=jumbotron>Rock-Paper-Scissors</div>
+        <div class="jumbotron">Rock-Paper-Scissors</div>
+        <div class="row instructions"><p>If an existing user is unresponsive, try resetting the game.</p>
+        <p>Game can be reset before exit or upon arrival to avoid this error.</p></div>
         <div class="row">
             <div class="col-md-6">
             <div id="input-area-one"><span id="to-submit-name-one">Name: <input id="user-name-one" type="text"><button id="submit-name-one" type="submit">Join As Player 1</button></span></div>
@@ -86,6 +88,7 @@ $(document).ready(function() {
     var amUserOne = false
     var amUserTwo = false
     var isResult = false
+   // var isChat = true
 
     //so any change in value to the database syncs with the local variables
     database.ref().on("value", function(snap){
@@ -231,6 +234,7 @@ $(document).ready(function() {
     $("#choice1").click(function() {
         if ((amUserOne == true) && (isOneChoice == false)){
             $("#player1Prompt").text("Player 1 Has Chosen")
+            $("#results").text("Rock")
             database.ref('player1').set({
                 Choice: "Rock",
                 isOneChoice: true
@@ -242,6 +246,7 @@ $(document).ready(function() {
     $("#choice2").click(function(){
         if ((amUserOne == true) && (isOneChoice == false)){    
             $("#player1Prompt").text("Player 1 Has Chosen")
+            $("#results").text("Paper")
             database.ref('player1').set({
                 Choice: "Paper",
                 isOneChoice: true,
@@ -253,6 +258,7 @@ $(document).ready(function() {
     $("#choice3").click(function (){
         if ((amUserOne == true) && (isOneChoice == false)){
             $("#player1Prompt").text("Player 1 Has Chosen")
+            $("#results").text("Scissors")
             database.ref('player1').set({
                 Choice: "Scissors",
                 isOneChoice: true,
@@ -265,6 +271,7 @@ $(document).ready(function() {
         if (amUserTwo == true && isTwoChoice == false){   
             $("#player2Prompt").text("Player 2 Has Chosen")
             isTwoChoice = true
+            $("#results").text("Rock")
             database.ref('player2').set({
                 Choice: "Rock",
                 isTwoChoice: true
@@ -276,6 +283,7 @@ $(document).ready(function() {
     $("#twochoice2").click(function(){
         if (amUserTwo == true && isTwoChoice == false){
             $("#player2Prompt").text("Player 2 Has Chosen")
+            $("#results").text("Paper")
             database.ref('player2').set({
                 Choice: "Paper",
                 isTwoChoice: true
@@ -287,6 +295,7 @@ $(document).ready(function() {
     $("#twochoice3").click(function (){
         if (amUserTwo == true && isTwoChoice == false){
             $("#player2Prompt").text("Player 2 Has Chosen")
+            $("#results").text("Scissors")
             database.ref('player2').set({
                 Choice: "Scissors",
                 isTwoChoice: true
